@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ido Shevet — Coming soon</title>
+  <meta name="description" content="Ido Shevet, Product Designer. New site coming soon.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f6f5f1;
+      --fg: #111111;
+      --muted: #8a8780;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #0f0f0e; --fg: #f2f1ec; --muted: #77756f; }
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: "Inter Tight", system-ui, -apple-system, sans-serif;
+      display: grid;
+      place-items: center;
+      min-height: 100svh;
+      padding: 24px;
+      text-align: center;
+      -webkit-font-smoothing: antialiased;
+    }
+    main {
+      animation: fade 1.2s ease-out both;
+    }
+    p {
+      font-weight: 400;
+      font-size: clamp(1.25rem, 3vw, 2rem);
+      line-height: 1.35;
+      letter-spacing: -0.02em;
+    }
+    a {
+      color: var(--fg);
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 0.2em;
+      transition: text-underline-offset 0.2s ease;
+    }
+    a:hover { text-underline-offset: 0.35em; }
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      main { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <p>coming soon, meanwhile you can just <a href="mailto:hello@idoshevet.com">email</a> me</p>
+  </main>
+</body>
+</html>
