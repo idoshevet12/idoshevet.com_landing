@@ -36,17 +36,41 @@
     p {
       font-weight: 400;
       font-size: clamp(1.25rem, 3vw, 2rem);
-      line-height: 1.35;
-      letter-spacing: -0.02em;
+      line-height: 1.55;
+      letter-spacing: 0.06em;
     }
-    a {
+    .copy {
+      font: inherit;
+      letter-spacing: inherit;
       color: var(--fg);
+      background: none;
+      border: 0;
+      padding: 0;
+      cursor: pointer;
       text-decoration: underline;
       text-decoration-thickness: 1px;
       text-underline-offset: 0.2em;
       transition: text-underline-offset 0.2s ease;
     }
-    a:hover { text-underline-offset: 0.35em; }
+    .copy:hover { text-underline-offset: 0.35em; }
+    .copy:focus-visible { outline: 1px solid var(--fg); outline-offset: 4px; }
+    .snackbar {
+      position: fixed;
+      left: 50%;
+      bottom: 32px;
+      transform: translate(-50%, 16px);
+      background: var(--fg);
+      color: var(--bg);
+      font-size: 0.9375rem;
+      letter-spacing: 0.06em;
+      padding: 12px 20px;
+      border-radius: 999px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      white-space: nowrap;
+    }
+    .snackbar.show { opacity: 1; transform: translate(-50%, 0); }
     @keyframes fade {
       from { opacity: 0; transform: translateY(8px); }
       to   { opacity: 1; transform: none; }
@@ -58,7 +82,46 @@
 </head>
 <body>
   <main>
-    <p>coming soon, meanwhile you can just <a href="mailto:hello@idoshevet.com">email</a> me</p>
+    <p>coming soon,<br>meanwhile you can copy <button class="copy" type="button" id="copy">hi@idoshevet.com</button> and email me on gmail or whatever</p>
   </main>
+  <div class="snackbar" id="snackbar" role="status" aria-live="polite"></div>
+  <script>
+    const email = "hi@idoshevet.com";
+    const button = document.getElementById("copy");
+    const snackbar = document.getElementById("snackbar");
+    let timer;
+
+    function show(message) {
+      snackbar.textContent = message;
+      snackbar.classList.add("show");
+      clearTimeout(timer);
+      timer = setTimeout(() => snackbar.classList.remove("show"), 2200);
+    }
+
+    function fallbackCopy(text) {
+      const field = document.createElement("textarea");
+      field.value = text;
+      field.setAttribute("readonly", "");
+      field.style.position = "fixed";
+      field.style.opacity = "0";
+      document.body.appendChild(field);
+      field.select();
+      let ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) {}
+      document.body.removeChild(field);
+      return ok;
+    }
+
+    button.addEventListener("click", async () => {
+      let ok = false;
+      try {
+        await navigator.clipboard.writeText(email);
+        ok = true;
+      } catch (e) {
+        ok = fallbackCopy(email);
+      }
+      show(ok ? "email address copied" : "couldn't copy, it's " + email);
+    });
+  </script>
 </body>
 </html>
