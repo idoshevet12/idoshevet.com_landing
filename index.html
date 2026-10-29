@@ -1,47 +1,85 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Ido Shevet — Coming soon</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Ido Shevet — coming soon</title>
   <meta name="description" content="Ido Shevet, Product Designer. New site coming soon.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500&family=Noto+Sans+Arabic:wght@100..900&family=Noto+Sans+Hebrew:wght@100..900&display=swap" rel="stylesheet">
   <style>
+    /* PP Neue Montreal (Pangram Pangram). The free download is for personal use only and
+       may not be used on a website. After buying a web license, put the .woff2 files (Light, Regular, Medium) in a
+       "fonts" folder next to this page and they will be used automatically.
+       Until then the page falls back to Inter Tight, a free close match. */
+    @font-face {
+      font-family: "PP Neue Montreal";
+      src: url("fonts/PPNeueMontreal-Light.woff2") format("woff2");
+      font-weight: 300;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: "PP Neue Montreal";
+      src: url("fonts/PPNeueMontreal-Medium.woff2") format("woff2");
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: "PP Neue Montreal";
+      src: url("fonts/PPNeueMontreal-Regular.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    /* One fixed look, no light/dark switch */
     :root {
-      --bg: #f6f5f1;
-      --fg: #111111;
-      --muted: #8a8780;
+      --bg: #ffffff;
+      --fg: #0e0e0e;
+      --platter: #f0f0ee;
+      --on-fg: #ffffff;
+      color-scheme: light;
     }
-    @media (prefers-color-scheme: dark) {
-      :root { --bg: #0f0f0e; --fg: #f2f1ec; --muted: #77756f; }
-    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; }
     body {
-      background: var(--bg);
+      position: relative;
+      z-index: 0;
+      isolation: isolate;
+      background-color: var(--bg);
       color: var(--fg);
-      font-family: "Inter Tight", system-ui, -apple-system, sans-serif;
+      font-family: "PP Neue Montreal", "Inter Tight", system-ui, -apple-system, sans-serif;
       display: grid;
       place-items: center;
-      min-height: 100svh;
-      padding: 24px;
+      min-height: 100%;
+      padding-block: 24px 80px;
+      padding-left: max(16px, env(safe-area-inset-left, 0px));
+      padding-right: max(16px, env(safe-area-inset-right, 0px));
       text-align: center;
       -webkit-font-smoothing: antialiased;
     }
-    main {
-      animation: fade 1.2s ease-out both;
-    }
+    :lang(he) body, body:lang(he) { font-family: "PP Neue Montreal", "Inter Tight", "Noto Sans Hebrew", system-ui, sans-serif; }
+    :lang(ar) body, body:lang(ar) { font-family: "PP Neue Montreal", "Inter Tight", "Noto Sans Arabic", system-ui, sans-serif; }
+
+    main { animation: fade 1.2s ease-out both; }
     p {
       font-weight: 400;
       font-size: clamp(1.25rem, 3vw, 2rem);
-      line-height: 1.55;
-      letter-spacing: 0.06em;
+      line-height: 1.4;
+      letter-spacing: 0.02em;
+      transition: color 0.3s ease;
     }
+    /* Arabic letters must stay joined; Hebrew reads better without extra spacing */
+    html[lang="ar"] p { letter-spacing: 0; line-height: 1.65; }
+    html[lang="he"] p { letter-spacing: 0; }
+
     .copy {
       font: inherit;
-      letter-spacing: inherit;
+      letter-spacing: 0.02em;
       color: var(--fg);
       background: none;
       border: 0;
@@ -50,49 +88,204 @@
       text-decoration: underline;
       text-decoration-thickness: 1px;
       text-underline-offset: 0.2em;
-      transition: text-underline-offset 0.2s ease;
+      transition: text-underline-offset 0.2s ease, color 0.3s ease;
     }
     .copy:hover { text-underline-offset: 0.35em; }
     .copy:focus-visible { outline: 1px solid var(--fg); outline-offset: 4px; }
+
+    /* Top bar */
+    .controls {
+      position: fixed;
+      bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding-left: max(16px, env(safe-area-inset-left, 0px));
+      padding-right: max(16px, env(safe-area-inset-right, 0px));
+    }
+
+    /* Language: segmented control, pill track + sliding pill */
+    .seg {
+      position: relative;
+      display: flex;
+      padding: 4px;
+      border-radius: 999px;
+      background: var(--platter);
+      -webkit-backdrop-filter: blur(20px);
+      backdrop-filter: blur(20px);
+      font-size: 0.8125rem;
+      letter-spacing: 0.04em;
+      isolation: isolate;
+      transition: background-color 0.3s ease;
+    }
+    .seg .indicator {
+      position: absolute;
+      top: 4px;
+      bottom: 4px;
+      left: 4px;
+      width: 0;
+      border-radius: 999px;
+      background: var(--fg);
+      z-index: -1;
+      transition: left 0.32s ease-out, width 0.32s ease-out, background-color 0.3s ease;
+    }
+    .seg.no-anim .indicator { transition: none; }
+    .seg button {
+      font: inherit;
+      letter-spacing: inherit;
+      background: none;
+      border: 0;
+      height: 32px;
+      padding: 0 14px;
+      border-radius: 999px;
+      color: var(--fg);
+      cursor: pointer;
+      transition: color 0.16s ease-in 0.16s;
+    }
+    .seg button[aria-pressed="true"] { color: var(--on-fg); }
+    .seg button:not([aria-pressed="true"]):hover { opacity: 0.7; }
+    .seg button:focus-visible { outline: 1px solid var(--fg); outline-offset: 2px; }
+
+    /* Glass snackbar: rises from below into the middle of the screen */
     .snackbar {
       position: fixed;
       left: 50%;
-      bottom: 32px;
-      transform: translate(-50%, 16px);
-      background: var(--fg);
-      color: var(--bg);
-      font-size: 0.9375rem;
-      letter-spacing: 0.06em;
-      padding: 12px 20px;
+      top: 50%;
+      z-index: 10;
+      transform: translate(-50%, calc(-50% + 80px)) scale(0.96);
+      background: color-mix(in srgb, var(--fg) 14%, transparent);
+      -webkit-backdrop-filter: blur(24px) saturate(160%);
+      backdrop-filter: blur(24px) saturate(160%);
+      border: 1px solid color-mix(in srgb, var(--fg) 18%, transparent);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1), inset 0 1px 0 color-mix(in srgb, var(--fg) 12%, transparent);
+      color: var(--fg);
+      font-size: 1.125rem;
+      letter-spacing: 0.02em;
+      padding: 20px 32px;
       border-radius: 999px;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.25s ease, transform 0.25s ease;
+      transition: opacity 0.35s ease, transform 0.5s cubic-bezier(0.2, 0.9, 0.25, 1);
       white-space: nowrap;
     }
-    .snackbar.show { opacity: 1; transform: translate(-50%, 0); }
+    html[lang="ar"] .snackbar, html[lang="he"] .snackbar { letter-spacing: 0; }
+    .snackbar.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
     @keyframes fade {
       from { opacity: 0; transform: translateY(8px); }
       to   { opacity: 1; transform: none; }
     }
     @media (prefers-reduced-motion: reduce) {
       main { animation: none; }
+      .seg .indicator, .snackbar { transition: none; }
     }
   </style>
 </head>
 <body>
+  <div class="controls" dir="ltr">
+    <nav class="seg langs" aria-label="Language">
+      <span class="indicator" aria-hidden="true"></span>
+      <button type="button" data-value="en" lang="en" aria-label="English" aria-pressed="true">en</button>
+      <button type="button" data-value="he" lang="he" aria-label="עברית">he</button>
+      <button type="button" data-value="ar" lang="ar" aria-label="العربية">ar</button>
+      <button type="button" data-value="sv" lang="sv" aria-label="Svenska">sv</button>
+      <button type="button" data-value="de" lang="de" aria-label="Deutsch">de</button>
+    </nav>
+  </div>
+
   <main>
-    <p>coming soon,<br>meanwhile you can copy <button class="copy" type="button" id="copy">hi@idoshevet.com</button><br>and email me on gmail or whatever</p>
+    <p id="message">coming soon,<br>meanwhile you can copy <button class="copy" type="button" id="copy" dir="ltr">hi@idoshevet.com</button><br>and email me on gmail or whatever</p>
   </main>
   <div class="snackbar" id="snackbar" role="status" aria-live="polite"></div>
+
   <script>
     const email = "hi@idoshevet.com";
+    const root = document.documentElement;
+
+    function save(key, value) { try { localStorage.setItem(key, value); } catch (e) {} }
+    function load(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+
+    /* ---------- language: segmented control ---------- */
+    function segment(nav, onPick) {
+      const indicator = nav.querySelector(".indicator");
+      const buttons = nav.querySelectorAll("button");
+      const api = {
+        select(value) {
+          buttons.forEach(b => b.setAttribute("aria-pressed", String(b.dataset.value === value)));
+          api.place();
+        },
+        place() {
+          const active = nav.querySelector('[aria-pressed="true"]');
+          if (!active) return;
+          indicator.style.left = active.offsetLeft + "px";
+          indicator.style.width = active.offsetWidth + "px";
+        }
+      };
+      buttons.forEach(b => b.addEventListener("click", () => onPick(b.dataset.value)));
+      nav.classList.add("no-anim");
+      return api;
+    }
+
+    const copy = {
+      en: { dir: "ltr", l1: "coming soon,", pre: "meanwhile you can copy ", post: "", l3: "and email me on gmail or whatever",
+            copied: "email address copied", failed: "couldn't copy, it's ", title: "Ido Shevet — coming soon" },
+      he: { dir: "rtl", l1: "בקרוב,", pre: "בינתיים אפשר להעתיק את ", post: "", l3: "ולשלוח לי מייל מג׳ימייל או מה שבא לך",
+            copied: "כתובת המייל הועתקה", failed: "לא הצלחתי להעתיק, הכתובת היא ", title: "עידו שבט — בקרוב" },
+      ar: { dir: "rtl", l1: "قريبًا،", pre: "في هذه الأثناء يمكنك نسخ ", post: "", l3: "ومراسلتي عبر جيميل أو أي بريد آخر",
+            copied: "تم نسخ عنوان البريد الإلكتروني", failed: "تعذّر النسخ، العنوان هو ", title: "عيدو شيفيت — قريبًا" },
+      sv: { dir: "ltr", l1: "kommer snart,", pre: "under tiden kan du kopiera ", post: "", l3: "och mejla mig från gmail eller vad som helst",
+            copied: "e-postadressen kopierad", failed: "kunde inte kopiera, den är ", title: "Ido Shevet — kommer snart" },
+      de: { dir: "ltr", l1: "kommt bald,", pre: "in der zwischenzeit kannst du ", post: " kopieren", l3: "und mir über gmail oder sonstwas schreiben",
+            copied: "e-mail-adresse kopiert", failed: "kopieren fehlgeschlagen, sie lautet ", title: "Ido Shevet — kommt bald" }
+    };
+
+    const message = document.getElementById("message");
     const button = document.getElementById("copy");
     const snackbar = document.getElementById("snackbar");
+    let currentLang = "en";
     let timer;
 
-    function show(message) {
-      snackbar.textContent = message;
+    const langSeg = segment(document.querySelector(".langs"), setLang);
+
+    function setLang(lang) {
+      currentLang = copy[lang] ? lang : "en";
+      const t = copy[currentLang];
+      root.lang = currentLang;
+      root.dir = t.dir;
+      document.title = t.title;
+      message.replaceChildren(
+        t.l1, document.createElement("br"),
+        t.pre, button, t.post, document.createElement("br"),
+        t.l3
+      );
+      langSeg.select(currentLang);
+      save("lang", currentLang);
+    }
+
+    function initialLang() {
+      const saved = load("lang");
+      if (saved && copy[saved]) return saved;
+      for (const l of navigator.languages || [navigator.language || "en"]) {
+        const code = l.slice(0, 2).toLowerCase();
+        if (code === "iw") return "he";
+        if (copy[code]) return code;
+      }
+      return "en";
+    }
+
+    setLang(initialLang());
+    document.fonts.ready.then(() => {
+      langSeg.place();
+      requestAnimationFrame(() => document.querySelectorAll(".seg").forEach(n => n.classList.remove("no-anim")));
+    });
+
+    /* ---------- copy email ---------- */
+    function show(text) {
+      snackbar.textContent = text;
+      snackbar.dir = copy[currentLang].dir;
       snackbar.classList.add("show");
       clearTimeout(timer);
       timer = setTimeout(() => snackbar.classList.remove("show"), 2200);
@@ -120,7 +313,7 @@
       } catch (e) {
         ok = fallbackCopy(email);
       }
-      show(ok ? "email address copied" : "couldn't copy, it's " + email);
+      show(ok ? copy[currentLang].copied : copy[currentLang].failed + email);
     });
   </script>
 </body>
